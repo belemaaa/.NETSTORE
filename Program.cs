@@ -1,4 +1,6 @@
 ﻿using _netstore.Data;
+using _netstore.Interfaces;
+using _netstore.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace _netstore;
@@ -10,9 +12,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
