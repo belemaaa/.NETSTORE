@@ -66,3 +66,11 @@
 /Users/graceitamunoala/Projects/.netstore/.netstore/obj/Debug/net6.0/ref/.netstore.dll
 /Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Humanizer.dll
 /Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.EntityFrameworkCore.Design.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.Internal.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.Extensions.Identity.Core.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.Extensions.Identity.Stores.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.IdentityModel.Abstractions.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/obj/Debug/net6.0/.netstore.sourcelink.json

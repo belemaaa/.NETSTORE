@@ -1,17 +1,40 @@
 ﻿using System;
 using _netstore.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace _netstore.Data
 {
     public class Seed
     {
         private readonly ApplicationDbContext dbContext;
-        public Seed(ApplicationDbContext context)
+        private readonly UserManager<User> _userManager;
+
+        public Seed(ApplicationDbContext context, UserManager<User> userManager)
         {
             this.dbContext = context;
+            this._userManager = userManager;
         }
-        public void SeedDataContext()
+        public async Task SeedDataContext()
         {
+            if (!_userManager.Users.Any())
+            {
+                var user = new User
+                {
+                    UserName = "Bob",
+                    Email = "bob@test.com"
+                };
+                await _userManager.CreateAsync(user, "Pa$$w0rd");
+                await _userManager.AddToRoleAsync(user, "Member");
+
+                var admin = new User
+                {
+                    UserName = "admin",
+                    Email = "admin@test.com"
+                };
+                await _userManager.CreateAsync(admin, "Pa$$w0rd");
+                await _userManager.AddToRolesAsync(admin, new[] {"Member", "Admin"});
+            }
+             
             if (!dbContext.Owners.Any())
             {
                 var owners = new List<Owner>()

@@ -20,9 +20,9 @@ namespace _netstore.Controllers
 
         [HttpGet]
         [ProducesResponseType(200, Type=typeof(ICollection<Product>))]
-        public IActionResult GetProducts()
+        public async Task<IActionResult> GetProducts()
         {
-            var products = _productRepository.GetProducts();
+            var products = await _productRepository.GetProducts();
             if(!ModelState.IsValid){
                 return BadRequest(ModelState);
             }
@@ -32,14 +32,14 @@ namespace _netstore.Controllers
         [HttpGet("{productId}")]
         [ProducesResponseType(200, Type=typeof(Product))]
         [ProducesResponseType(404)]
-        public IActionResult GetProduct(int productId)
+        public async Task<IActionResult> GetProduct(int productId)
         {
             bool productExists = _productRepository.ProductExists(productId);
             if (!productExists)
             {
                 return NotFound("Product does not exist");
             }
-            var product = _productRepository.GetProduct(productId);
+            var product = await _productRepository.GetProduct(productId);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

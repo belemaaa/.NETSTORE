@@ -5,9 +5,9 @@ namespace _netstore.Interfaces
 {
 	public interface IProductRepository
 	{
-		ICollection<Product> GetProducts();
+		Task<ICollection<Product>> GetProducts();
 
-		Product GetProduct(int productId);
+		Task<Product> GetProduct(int productId);
 
 		bool AddProduct(int ownerId, Product product);
 

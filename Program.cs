@@ -1,6 +1,8 @@
 ﻿using _netstore.Data;
 using _netstore.Interfaces;
+using _netstore.Models;
 using _netstore.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace _netstore;
@@ -15,8 +17,6 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
-
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -26,9 +26,14 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+        //identity framework
+        builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+
         var app = builder.Build();
 
-        // data seeding
+
+        // db seeding
         if (args.Length == 1 && args[0].ToLower() == "seeddata")
         {
             SeedData(app);
@@ -51,6 +56,12 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseCors(opt =>
+        {
+            opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins();
+        });
+
 
         app.UseHttpsRedirection();
 
