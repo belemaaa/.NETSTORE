@@ -25,6 +25,7 @@
     <None Remove="Data\" />
     <None Remove="Interfaces\" />
     <None Remove="Repositories\" />
+    <None Remove="DTO\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />
@@ -33,5 +34,6 @@
     <Folder Include="Interfaces\" />
     <Folder Include="Repositories\" />
     <Folder Include="Repositories\" />
+    <Folder Include="DTO\" />
   </ItemGroup>
 </Project>

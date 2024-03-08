@@ -9,11 +9,11 @@ namespace _netstore.Controllers
     [ApiController]
 
     public class ProductController : Controller
-	{
+    {
         private readonly IProductRepository _productRepository;
 
         public ProductController(IProductRepository productRepository)
-		{
+        {
             this._productRepository = productRepository;
         }
 
@@ -48,6 +48,6 @@ namespace _netstore.Controllers
         }
 
 
-	}
+    }
 }
 
