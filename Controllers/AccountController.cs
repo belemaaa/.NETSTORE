@@ -39,7 +39,7 @@ namespace _netstore.Controllers
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
             {
-                return Unauthorized("Invalid credentials");
+                return Unauthorized(new {message = "Invalid credentials"});
             }
             var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
             if (!result.Succeeded)
@@ -52,7 +52,7 @@ namespace _netstore.Controllers
             
 
         [HttpPost("signup")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
         public async Task<IActionResult> Signup(SignupDTO signupDto)
@@ -82,7 +82,7 @@ namespace _netstore.Controllers
                 return ValidationProblem();
             }
             await _userManager.AddToRoleAsync(newUser, "Member");
-            return Ok(new { message = "New user has been created successfully" });
+            return CreatedAtAction(nameof(Signup), new { id = newUser.Id }, new { message = "New user has been created successfully" });
         }
 
     }
