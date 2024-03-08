@@ -3,9 +3,9 @@ namespace _netstore.DTO
 {
 	public class UserDto
 	{
-		public string? AccessToken { get; set; }
-
 		public string? Id { get; set; }
+
+		public string? Token { get; set; }
 
 		public string? Username { get; set; }
 

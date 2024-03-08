@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using _netstore.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,27 +15,8 @@ namespace _netstore.Data
             this.dbContext = context;
             this._userManager = userManager;
         }
-        public async Task SeedDataContext()
-        {
-            if (!_userManager.Users.Any())
-            {
-                var user = new User
-                {
-                    UserName = "Bob",
-                    Email = "bob@test.com"
-                };
-                await _userManager.CreateAsync(user, "Pa$$w0rd");
-                await _userManager.AddToRoleAsync(user, "Member");
-
-                var admin = new User
-                {
-                    UserName = "admin",
-                    Email = "admin@test.com"
-                };
-                await _userManager.CreateAsync(admin, "Pa$$w0rd");
-                await _userManager.AddToRolesAsync(admin, new[] {"Member", "Admin"});
-            }
-             
+        public void SeedDataContext()
+        { 
             if (!dbContext.Owners.Any())
             {
                 var owners = new List<Owner>()
@@ -94,8 +76,43 @@ namespace _netstore.Data
                     }
                 };
                 dbContext.Owners.AddRange(owners);
+                dbContext.SaveChanges();
             }
-            dbContext.SaveChanges();
+        }
+
+        public static async Task SeedUsersAsync(IApplicationBuilder applicationBuilder)
+        {
+            using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
+            {
+                //Users
+                var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                string adminUserEmail = "graceitamunoala@gmail.com";
+
+                var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
+                if (adminUser == null)
+                {
+                    var newAdminUser = new User()
+                    {
+                        UserName = "grace",
+                        Email = adminUserEmail,
+                    };
+                    await userManager.CreateAsync(newAdminUser, "Pa$$w0rd");
+                    await userManager.AddToRoleAsync(newAdminUser, "Admin");
+                }
+
+                string appUserEmail = "bob@gmail.com";
+                var appUser = await userManager.FindByEmailAsync(appUserEmail);
+                if (appUser == null)
+                {
+                    var newAppUser = new User()
+                    {
+                        UserName = "app-user",
+                        Email = appUserEmail,
+                    };
+                    await userManager.CreateAsync(newAppUser, "Pa$$w0rd");
+                    await userManager.AddToRoleAsync(newAppUser, "Member");
+                }
+            }
         }
     }
 }

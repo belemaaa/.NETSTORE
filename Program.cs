@@ -1,9 +1,14 @@
-﻿using _netstore.Data;
+﻿using System.Text;
+using _netstore.Data;
 using _netstore.Interfaces;
 using _netstore.Models;
 using _netstore.Repositories;
+using _netstore.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace _netstore;
 
@@ -17,21 +22,32 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddTransient<Seed>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<TokenService>();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddCors();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         //db config
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
-
         //identity framework
         builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        builder.Services.AddAuthentication();
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:TokenKey"]))
+                };
+            });
         builder.Services.AddAuthorization();
 
         var app = builder.Build();
