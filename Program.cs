@@ -19,6 +19,7 @@ public class Program
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         //db config
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -28,7 +29,10 @@ public class Program
 
         //identity framework
         builder.Services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+        builder.Services.AddAuthentication();
+        builder.Services.AddAuthorization();
 
         var app = builder.Build();
 
@@ -66,7 +70,6 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
 
         app.MapControllers();
 

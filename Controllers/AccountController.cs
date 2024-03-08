@@ -2,6 +2,7 @@
 using _netstore.Data;
 using _netstore.DTO;
 using _netstore.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +16,14 @@ namespace _netstore.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IMapper _mapper;
 
-        public AccountController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper)
         {
             this._context = context;
             this._userManager = userManager;
             this._signInManager = signInManager;
+            this._mapper = mapper;
         }
 
         [HttpPost("login")]
@@ -32,28 +35,26 @@ namespace _netstore.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-             }
+            }
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
-            if (user != null)
+            if (user == null)
             {
-                var checkPassword = await _userManager.CheckPasswordAsync(user, loginDto.Password);
-                if (checkPassword)
-                {
-                    var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
-                    if (result.Succeeded)
-                    {
-                        return Ok(new { Message = "Login was successful", User = user });
-                    }
-                }
                 return Unauthorized("Invalid credentials");
             }
-            return NotFound("User does not exist");
-            
+            var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
+            if (!result.Succeeded)
+            {
+                return Unauthorized("Invalid credentials");
+            }
+            var mappedUser = _mapper.Map<UserDto>(user);
+            return Ok(new { message = "Login was successful", User = mappedUser });
         }
+            
 
         [HttpPost("signup")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(409)]
         public async Task<IActionResult> Signup(SignupDTO signupDto)
         {
             if (!ModelState.IsValid)
@@ -63,19 +64,25 @@ namespace _netstore.Controllers
             var existingUser = await _userManager.FindByEmailAsync(signupDto.Email);
             if (existingUser != null)
             {
-                var newUser = new User
-                {
-                    UserName = signupDto.Username,
-                    Email = signupDto.Email,
-                    PhoneNumber = signupDto.PhoneNumber
-                };
-                var result = await _userManager.CreateAsync(newUser, signupDto.Password);
-                if (result.Succeeded)
-                {
-                    return Ok(new { Message = "New user has been created successfully" });
-                }   
+                return Conflict(new { message = "User with this email already exists" });
             }
-            return Unauthorized(new { message = "User with these credentials already exists" });
+            var newUser = new User
+            {
+                UserName = signupDto.Username,
+                Email = signupDto.Email,
+                PhoneNumber = signupDto.PhoneNumber
+            };
+            var result = await _userManager.CreateAsync(newUser, signupDto.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return ValidationProblem();
+            }
+            await _userManager.AddToRoleAsync(newUser, "Member");
+            return Ok(new { message = "New user has been created successfully" });
         }
 
     }

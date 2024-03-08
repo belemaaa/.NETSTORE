@@ -94,8 +94,8 @@ namespace _netstore.Data
                     }
                 };
                 dbContext.Owners.AddRange(owners);
-                dbContext.SaveChanges();
             }
+            dbContext.SaveChanges();
         }
     }
 }

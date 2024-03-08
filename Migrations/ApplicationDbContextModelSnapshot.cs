@@ -180,15 +180,15 @@ namespace _netstore.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "4b8f2bd8-e14d-4c1b-b79b-e8624c1f753a",
-                            ConcurrencyStamp = "ab94f839-18dc-4b26-800c-188d0d2044f1",
+                            Id = "fca07470-b0f2-4cad-b8b5-dc0acacea3e0",
+                            ConcurrencyStamp = "b96c963a-f1fb-4970-b9e4-e55d48cf8ea9",
                             Name = "Member",
                             NormalizedName = "MEMBER"
                         },
                         new
                         {
-                            Id = "e5b234f0-c63c-484c-a2a1-3d93e3c47e71",
-                            ConcurrencyStamp = "d8ecd81e-cfc2-472f-8d48-960c5a11f333",
+                            Id = "fd2e5371-2c26-4ef5-940a-7b7122c14422",
+                            ConcurrencyStamp = "b724bfc2-be27-4dc2-be6a-ff282ee4d58c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
