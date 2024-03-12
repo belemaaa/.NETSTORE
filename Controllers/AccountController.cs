@@ -53,7 +53,10 @@ namespace _netstore.Controllers
             var dto = new UserDto
             {
                 Id = user.Id,
-                Token = await _tokenService.GenerateToken(user)
+                Token = await _tokenService.GenerateToken(user),
+                Username = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
             };
             return Ok(new { message = "Login was successful", User = dto });
         }
@@ -104,14 +107,9 @@ namespace _netstore.Controllers
         [Authorize]
         [HttpGet("currentUser")]
         [ProducesResponseType(200, Type=typeof(UserDto))]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
         public async Task<IActionResult> GetCurrentUser()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
             var dto = new UserDto
             {

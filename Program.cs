@@ -7,8 +7,8 @@ using _netstore.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace _netstore;
 
@@ -24,14 +24,42 @@ public class Program
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<TokenService>();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            //configuring swagger to send jwt tokens
+            var jwtSecurityScheme = new OpenApiSecurityScheme
+            {
+                BearerFormat = "JWT",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                Description = "Put Bearer + your token in the box below",
+                Reference = new OpenApiReference
+                {
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            };
+            c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    jwtSecurityScheme, Array.Empty<string>()
+                }
+            });
+        });
+
+
         builder.Services.AddCors();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         //db config
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
+
         //identity framework
         builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -74,7 +102,10 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.ConfigObject.AdditionalItems.Add("persistAuthorization", "true");
+            });
         }
 
         app.UseCors(opt =>
@@ -84,6 +115,8 @@ public class Program
 
 
         app.UseHttpsRedirection();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 
