@@ -6,30 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace _netstore.Repositories
 {
-	public class ProductRepository : IProductRepository
-	{
+    public class ProductRepository : IProductRepository
+    {
         private readonly ApplicationDbContext _context;
 
         public ProductRepository(ApplicationDbContext context)
-		{
-			this._context = context;
-		}
-
-        public bool AddProduct(int ownerId, Product product)
         {
-            var owner = _context.Owners.Where(o => o.Id == ownerId).FirstOrDefault();
-            var newProduct = new Product
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Image = product.Image,
-                Type = product.Type,
-                QuantityAvailable = product.QuantityAvailable,
-                CreatedAt = DateTime.UtcNow,
-                Owner = owner
-            };
-            _context.Add(product);
+            this._context = context;
+        }
+
+        public bool AddProduct(Product product)
+        {
+            this._context.Add(product);
             return true;
         }
 

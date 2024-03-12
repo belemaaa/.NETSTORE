@@ -81,7 +81,7 @@ namespace _netstore.Controllers
             }
             else if (existingUsername != null)
             {
-                return Conflict(new { message = "User with these credentials email already exists" });
+                return Conflict(new { message = "User with these credentials already exists" });
             }
 
             var newUser = new User

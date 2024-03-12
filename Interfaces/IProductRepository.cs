@@ -9,7 +9,7 @@ namespace _netstore.Interfaces
 
 		Task<Product> GetProduct(int productId);
 
-		bool AddProduct(int ownerId, Product product);
+		bool AddProduct(Product product);
 
 		bool UpdateProduct(int productId, Product product);
 

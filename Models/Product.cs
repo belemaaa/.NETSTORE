@@ -1,4 +1,6 @@
 ﻿using System;
+using _netstore.Data;
+
 namespace _netstore.Models
 {
 	public class Product
@@ -13,11 +15,11 @@ namespace _netstore.Models
 
 		public string? Image { get; set; }
 
-		public string? Type { get; set; }
+		public ProductType ProductType { get; set; }
 
 		public int QuantityAvailable { get; set; }
 
-		public Owner Owner { get; set; }
+		public User Owner { get; set; }
 
 		public DateTime CreatedAt { get; set; }
 	}

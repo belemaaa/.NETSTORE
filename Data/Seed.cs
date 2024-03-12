@@ -17,65 +17,45 @@ namespace _netstore.Data
         }
         public void SeedDataContext()
         { 
-            if (!dbContext.Owners.Any())
+            if (!dbContext.Products.Any())
             {
-                var owners = new List<Owner>()
-                {
-                    new Owner
+                var products = new List<Product>()
+                {    
+                    new Product
                     {
-                        Name = "Grace",
-                        Email = "grace@gmail.com",
-                        PhoneNumber = "09099989766",
+                        Name = "Nike shorts",
+                        Description = "These are the best Nike shorts available",
+                        Price = "15,000",
+                        Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1707570362/mbxl3jx8js0dzz3h9r4t.jpg",
+                        ProductType = ProductType.Shorts,
+                        QuantityAvailable = 14,
                         CreatedAt = DateTime.Now,
-                        Products = new List<Product>()
-                        {
-                            new Product
-                            {
-                                Name = "Nike shorts",
-                                Description = "These are the best Nike shorts available",
-                                Price = "15,000",
-                                Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1707570362/mbxl3jx8js0dzz3h9r4t.jpg",
-                                Type = "Clothing",
-                                QuantityAvailable = 14,
-                                CreatedAt = DateTime.Now,
-                            },
-
-                            new Product
-                            {
-                                Name = "Samsung phone",
-                                Description = "Mobile samsung phone",
-                                Price = "100,000",
-                                Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1694168777/cld-sample-2.jpg",
-                                Type = "Electronics",
-                                QuantityAvailable = 30,
-                                CreatedAt = DateTime.Now,
-                            }
-                        }
-                        
                     },
 
-                    new Owner
+                    new Product
                     {
-                        Name = "James",
-                        Email = "james@gmail.com",
-                        PhoneNumber = "09876667887",
+                        Name = "Samsung phone",
+                        Description = "Mobile samsung phone",
+                        Price = "100,000",
+                        Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1694168777/cld-sample-2.jpg",
+                        ProductType = ProductType.Electronics,
+                        QuantityAvailable = 30,
                         CreatedAt = DateTime.Now,
-                        Products = new List<Product>()
-                        {
-                            new Product
-                            {
-                                Name = "Bikins",
-                                Description = "Bikinis for both men and women",
-                                Price = "15,000",
-                                Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1707570362/mbxl3jx8js0dzz3h9r4t.jpg",
-                                Type = "Clothing",
-                                QuantityAvailable = 23,
-                                CreatedAt = DateTime.Now,
-                            },
-                        }
-                    }
+                    },
+
+                    new Product
+                    {
+                        Name = "Bikins",
+                        Description = "Bikinis for both men and women",
+                        Price = "15,000",
+                        Image = "https://res.cloudinary.com/drrnvvy3v/image/upload/v1707570362/mbxl3jx8js0dzz3h9r4t.jpg",
+                        ProductType = ProductType.Womens,
+                        QuantityAvailable = 23,
+                        CreatedAt = DateTime.Now,
+                    },
+
                 };
-                dbContext.Owners.AddRange(owners);
+                dbContext.Products.AddRange(products);
                 dbContext.SaveChanges();
             }
         }

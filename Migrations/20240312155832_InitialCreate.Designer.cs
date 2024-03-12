@@ -12,8 +12,8 @@ using _netstore.Data;
 namespace _netstore.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240308082051_Identity")]
-    partial class Identity
+    [Migration("20240312155832_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,31 +23,6 @@ namespace _netstore.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("_netstore.Models.Owner", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Owners");
-                });
 
             modelBuilder.Entity("_netstore.Models.Product", b =>
                 {
@@ -69,17 +44,17 @@ namespace _netstore.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Price")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuantityAvailable")
+                    b.Property<int>("ProductType")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("QuantityAvailable")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -182,15 +157,15 @@ namespace _netstore.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "fca07470-b0f2-4cad-b8b5-dc0acacea3e0",
-                            ConcurrencyStamp = "b96c963a-f1fb-4970-b9e4-e55d48cf8ea9",
+                            Id = "12bc868c-ea75-45db-8991-e0f3003db090",
+                            ConcurrencyStamp = "463814ee-3de0-44e9-85f3-8d0df90d0e52",
                             Name = "Member",
                             NormalizedName = "MEMBER"
                         },
                         new
                         {
-                            Id = "fd2e5371-2c26-4ef5-940a-7b7122c14422",
-                            ConcurrencyStamp = "b724bfc2-be27-4dc2-be6a-ff282ee4d58c",
+                            Id = "43152688-0087-42b0-9f44-c4c9da9bdc3d",
+                            ConcurrencyStamp = "55b04523-8040-4cc6-a26b-8ebb855a9e5f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -304,11 +279,9 @@ namespace _netstore.Migrations
 
             modelBuilder.Entity("_netstore.Models.Product", b =>
                 {
-                    b.HasOne("_netstore.Models.Owner", "Owner")
-                        .WithMany("Products")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("_netstore.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
 
                     b.Navigation("Owner");
                 });
@@ -362,11 +335,6 @@ namespace _netstore.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("_netstore.Models.Owner", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

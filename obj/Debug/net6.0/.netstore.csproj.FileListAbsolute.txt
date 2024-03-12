@@ -75,3 +75,4 @@
 /Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/Microsoft.IdentityModel.Abstractions.dll
 /Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/AutoMapper.dll
 /Users/graceitamunoala/Projects/.netstore/.netstore/bin/Debug/net6.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+/Users/graceitamunoala/Projects/.netstore/.netstore/obj/Debug/net6.0/.netstore.sourcelink.json

@@ -13,8 +13,6 @@ namespace _netstore.Data
 		}
 		public DbSet<Product> Products { get; set; }
 
-		public DbSet<Owner> Owners { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
