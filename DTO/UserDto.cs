@@ -1,7 +1,7 @@
 ﻿using System;
 namespace _netstore.DTO
 {
-	public class UserDto
+	public class UserDTO
 	{
 		public string? Id { get; set; }
 

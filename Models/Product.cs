@@ -15,11 +15,11 @@ namespace _netstore.Models
 
 		public string? Image { get; set; }
 
-		public ProductType ProductType { get; set; }
+		public string? ProductType { get; set; }
 
 		public int QuantityAvailable { get; set; }
 
-		public User Owner { get; set; }
+		public User? Owner { get; set; }
 
 		public DateTime CreatedAt { get; set; }
 	}

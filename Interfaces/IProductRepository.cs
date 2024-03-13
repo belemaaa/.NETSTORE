@@ -11,9 +11,9 @@ namespace _netstore.Interfaces
 
 		bool AddProduct(Product product);
 
-		bool UpdateProduct(int productId, Product product);
+		bool UpdateProduct(Product product);
 
-		bool DeleteProduct(int productId);
+		bool DeleteProduct(Product product);
 
 		bool ProductExists(int productId);
 

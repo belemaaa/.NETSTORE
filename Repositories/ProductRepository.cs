@@ -18,12 +18,13 @@ namespace _netstore.Repositories
         public bool AddProduct(Product product)
         {
             this._context.Add(product);
-            return true;
+            return Save();
         }
 
-        public bool DeleteProduct(int productId)
+        public bool DeleteProduct(Product product)
         {
-            throw new NotImplementedException();
+            this._context.Remove(product);
+                return Save();
         }
 
         public bool ProductExists(int productId)
@@ -37,9 +38,10 @@ namespace _netstore.Repositories
             return saved > 0 ? true : false;
         }
 
-        public bool UpdateProduct(int productId, Product product)
+        public bool UpdateProduct(Product product)
         {
-            throw new NotImplementedException();
+            this._context.Update(product);
+            return Save();
         }
 
         public async Task<Product> GetProduct(int productId)

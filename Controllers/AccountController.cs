@@ -31,7 +31,7 @@ namespace _netstore.Controllers
         }
 
         [HttpPost("login")]
-        [ProducesResponseType(200, Type=typeof(UserDto))]
+        [ProducesResponseType(200, Type=typeof(UserDTO))]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
         public async Task<IActionResult> Login(LoginDTO loginDto)
@@ -50,7 +50,7 @@ namespace _netstore.Controllers
             {
                 return Unauthorized("Invalid credentials");
             }
-            var dto = new UserDto
+            var dto = new UserDTO
             {
                 Id = user.Id,
                 Token = await _tokenService.GenerateToken(user),
@@ -106,12 +106,12 @@ namespace _netstore.Controllers
 
         [Authorize]
         [HttpGet("currentUser")]
-        [ProducesResponseType(200, Type=typeof(UserDto))]
+        [ProducesResponseType(200, Type=typeof(UserDTO))]
         [ProducesResponseType(401)]
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var dto = new UserDto
+            var dto = new UserDTO
             {
                 Token = await _tokenService.GenerateToken(user),
                 Id = user.Id,
