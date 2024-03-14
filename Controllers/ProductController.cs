@@ -54,7 +54,7 @@ namespace _netstore.Controllers
                 };
                 productDTOs.Add(productDto);
             }
-            return Ok(productDTOs);
+            return StatusCode(200, productDTOs);
         }
 
 
@@ -66,7 +66,7 @@ namespace _netstore.Controllers
             bool productExists = _productRepository.ProductExists(productId);
             if (!productExists)
             {
-                return NotFound("Product does not exist");
+                return StatusCode(404, new { message = "Product does not exist" });
             }
 
             var product = await _productRepository.GetProduct(productId);
@@ -84,11 +84,12 @@ namespace _netstore.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(400, ModelState);
             }
-            return Ok(productDto);
+            return StatusCode(200, productDto);
         }
 
+        //[Authorize(Roles = "Admin")] this allows you restrict this endpoint for just admin users
         [Authorize]
         [HttpPost]
         [ProducesResponseType(201)]
@@ -98,12 +99,12 @@ namespace _netstore.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(400, ModelState);
             }
             var owner = await _userManager.FindByNameAsync(User.Identity.Name);
             if (owner == null)
             {
-                return Unauthorized();
+                return StatusCode(401);
             }
 
             var imageResult = await _imageService.AddPhotoAsync(dto.Image);
@@ -121,9 +122,9 @@ namespace _netstore.Controllers
             var result = _productRepository.AddProduct(product);
             if (!result)
             {
-                return BadRequest();
+                return StatusCode(400);
             }
-            return CreatedAtAction(nameof(CreateProduct), new { id = product.Id }, new { message = "New product has been created successfully" });
+            return StatusCode(201, new { message = "New product has been created successfully" });
         }
 
     }

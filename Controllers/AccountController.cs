@@ -38,17 +38,17 @@ namespace _netstore.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(400, ModelState);
             }
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
             {
-                return Unauthorized(new {message = "Invalid credentials"});
+                return StatusCode(401, new {message = "Invalid credentials"});
             }
             var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password, false, false);
             if (!result.Succeeded)
             {
-                return Unauthorized("Invalid credentials");
+                return StatusCode(401, new { message = "Invalid credentials" });
             }
             var dto = new UserDTO
             {
@@ -58,7 +58,7 @@ namespace _netstore.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
-            return Ok(new { message = "Login was successful", User = dto });
+            return StatusCode(200, new { message = "Login was successful", User = dto });
         }
             
 
@@ -70,18 +70,18 @@ namespace _netstore.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return StatusCode(400, ModelState);
             }
 
             var existingEmail = await _userManager.FindByEmailAsync(signupDto.Email);
             var existingUsername = await _userManager.FindByNameAsync(signupDto.Username);
             if (existingEmail != null)
             {
-                return Conflict(new { message = "User with these credentials already exists" });
+                return StatusCode(409, new { message = "User with these credentials already exists" });
             }
             else if (existingUsername != null)
             {
-                return Conflict(new { message = "User with these credentials already exists" });
+                return StatusCode(409, new { message = "User with these credentials already exists" });
             }
 
             var newUser = new User
@@ -100,7 +100,7 @@ namespace _netstore.Controllers
                 return ValidationProblem();
             }
             await _userManager.AddToRoleAsync(newUser, "Member");
-            return CreatedAtAction(nameof(Signup), new { id = newUser.Id }, new { message = "New user has been created successfully" });
+            return StatusCode(201, new { message = "New user has been created successfully" });
         }
 
 
@@ -111,6 +111,10 @@ namespace _netstore.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return StatusCode(401, new { message = "Unauthorized" });
+            }
             var dto = new UserDTO
             {
                 Token = await _tokenService.GenerateToken(user),
@@ -119,7 +123,7 @@ namespace _netstore.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
             };
-            return Ok(new { user = dto });
+            return StatusCode(200, new { user = dto });
         }
 
     }
