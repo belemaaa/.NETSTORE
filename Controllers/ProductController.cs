@@ -34,7 +34,6 @@ namespace _netstore.Controllers
         public async Task<IActionResult> GetProducts()
         {
             var products = await _productRepository.GetProducts();
-
             var productDTOs = new List<ProductDTO>();
 
             foreach (var product in products)
@@ -50,10 +49,8 @@ namespace _netstore.Controllers
                     QuantityAvailable = product.QuantityAvailable,
                     Owner = _mapper.Map<OwnerDTO>(product.Owner)
                 };
-
                 productDTOs.Add(productDto);
             }
-
             return Ok(productDTOs);
         }
 
@@ -68,12 +65,25 @@ namespace _netstore.Controllers
             {
                 return NotFound("Product does not exist");
             }
+
             var product = await _productRepository.GetProduct(productId);
+            var productDto = new ProductDTO
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Image = product.Image,
+                ProductType = product.ProductType,
+                QuantityAvailable = product.QuantityAvailable,
+                Owner = _mapper.Map<OwnerDTO>(product.Owner)
+            };
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(product);
+            return Ok(productDto);
         }
 
         [Authorize]
