@@ -3,6 +3,7 @@ using _netstore.Data;
 using _netstore.DTO;
 using _netstore.Interfaces;
 using _netstore.Models;
+using _netstore.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,13 +20,15 @@ namespace _netstore.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly ImageService _imageService;
 
-        public ProductController(IProductRepository productRepository, ApplicationDbContext context, UserManager<User> userManager, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ApplicationDbContext context, UserManager<User> userManager, IMapper mapper, ImageService imageService)
         {
             this._productRepository = productRepository;
             this._context = context;
             this._userManager = userManager;
             this._mapper = mapper;
+            this._imageService = imageService;
         }
 
 
@@ -102,11 +105,14 @@ namespace _netstore.Controllers
             {
                 return Unauthorized();
             }
+
+            var imageResult = await _imageService.AddPhotoAsync(dto.Image);
             var product = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
+                Image = imageResult.Url.ToString(),
                 ProductType = dto.ProductType,
                 QuantityAvailable = dto.QuantityAvailable,
                 Owner = owner,

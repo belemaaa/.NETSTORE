@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using _netstore.Data;
+using _netstore.Helpers;
 using _netstore.Interfaces;
 using _netstore.Models;
 using _netstore.Repositories;
@@ -23,7 +24,10 @@ public class Program
         builder.Services.AddTransient<Seed>();
         builder.Services.AddScoped<IProductRepository, ProductRepository>();
         builder.Services.AddScoped<TokenService>();
+        builder.Services.AddScoped<ImageService>();
+        builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
         builder.Services.AddEndpointsApiExplorer();
+
         builder.Services.AddSwaggerGen(c =>
         {
             //configuring swagger to send jwt tokens
