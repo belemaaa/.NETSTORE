@@ -1,23 +1,20 @@
 ﻿using System;
+using _netstore.DTO;
 using _netstore.Models;
 
 namespace _netstore.Interfaces
 {
 	public interface IProductRepository
 	{
-		Task<ICollection<Product>> GetProducts();
+		Task<(List<ProductDTO>, int status,  bool isSuccessful, string message)> GetProducts();
 
-		Task<Product> GetProduct(int productId);
+		Task<(ProductDTO, int status, bool isSuccessful, string message)> GetProduct(int productId);
 
-		bool AddProduct(Product product);
+		Task<(int status, bool isSuccessful, string message)> AddProduct(CreateProductDTO model);
 
-		bool UpdateProduct(Product product);
+		Task<(Product product, int status, bool isSuccessful, string message)> UpdateProduct(int productId);
 
-		bool DeleteProduct(Product product);
-
-		bool ProductExists(int productId);
-
-		bool Save();
-	}
+		Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId);
+    }
 }
 

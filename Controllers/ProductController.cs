@@ -33,60 +33,45 @@ namespace _netstore.Controllers
 
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(ICollection<ProductDTO>))]
+        [ProducesResponseType(200)]
         public async Task<IActionResult> GetProducts()
         {
             var products = await _productRepository.GetProducts();
-            var productDTOs = new List<ProductDTO>();
-
-            foreach (var product in products)
+            if (!products.isSuccessful)
             {
-                var productDto = new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    Image = product.Image,
-                    ProductType = product.ProductType,
-                    QuantityAvailable = product.QuantityAvailable,
-                    Owner = _mapper.Map<OwnerDTO>(product.Owner)
-                };
-                productDTOs.Add(productDto);
+                return StatusCode(products.status, products.message);
             }
-            return StatusCode(200, productDTOs);
+
+            return Ok(new ApiResponse()
+            {
+                Data = products.Item1,
+                Message = products.message,
+                StatusCode = products.status,
+            });
         }
 
-
-        [HttpGet("{productId}")]
-        [ProducesResponseType(200, Type=typeof(Product))]
+        [HttpGet]
+        [ProducesResponseType(200)]
         [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> GetProduct(int productId)
         {
-            bool productExists = _productRepository.ProductExists(productId);
-            if (!productExists)
-            {
-                return StatusCode(404, new { message = "Product does not exist" });
-            }
-
-            var product = await _productRepository.GetProduct(productId);
-            var productDto = new ProductDTO
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Image = product.Image,
-                ProductType = product.ProductType,
-                QuantityAvailable = product.QuantityAvailable,
-                Owner = _mapper.Map<OwnerDTO>(product.Owner)
-            };
-
             if (!ModelState.IsValid)
             {
                 return StatusCode(400, ModelState);
             }
-            return StatusCode(200, productDto);
+
+            var product = await _productRepository.GetProduct(productId);
+            if (!product.isSuccessful)
+            {
+                return StatusCode(product.status, product.message);
+            }
+            return Ok(new ApiResponse()
+            {
+                Data = product.Item1,
+                Message = product.message,
+                StatusCode = 200,
+            });
         }
 
         //[Authorize(Roles = "Admin")] this allows you restrict this endpoint for just admin users
@@ -95,36 +80,24 @@ namespace _netstore.Controllers
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public async Task<IActionResult> CreateProduct(CreateProductDTO dto)
+        public async Task<IActionResult> CreateProduct([FromForm] CreateProductDTO product)
         {
             if (!ModelState.IsValid)
             {
                 return StatusCode(400, ModelState);
             }
-            var owner = await _userManager.FindByNameAsync(User.Identity.Name);
-            if (owner == null)
+
+            var newProduct = await _productRepository.AddProduct(product);
+            if (!newProduct.isSuccessful)
             {
-                return StatusCode(401);
+                return StatusCode(newProduct.status, newProduct.message);
             }
 
-            var imageResult = await _imageService.AddPhotoAsync(dto.Image);
-            var product = new Product
+            return Ok(new ApiResponse()
             {
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                Image = imageResult.Url.ToString(),
-                ProductType = dto.ProductType,
-                QuantityAvailable = dto.QuantityAvailable,
-                Owner = owner,
-                CreatedAt = DateTime.Now
-            };
-            var result = _productRepository.AddProduct(product);
-            if (!result)
-            {
-                return StatusCode(400);
-            }
-            return StatusCode(201, new { message = "New product has been created successfully" });
+                Message = newProduct.message,
+                StatusCode = newProduct.status
+            });
         }
 
     }

@@ -24,5 +24,7 @@ namespace _netstore.DTO
         public string? ProductType { get; set; }
 
         public int QuantityAvailable { get; set; }
+
+        public string? OwnerId { get; set; }
     }
 }
