@@ -50,15 +50,21 @@ namespace _netstore.Repositories
                     };
                     _context.Add(product);
                     _context.SaveChanges();
-
-                    response = true;
-                    msg = "Success";
-                    status = 201;
                 }
+                else
+                {
+                    response = false;
+                    status = 401;
+                    msg = "Unauthorized";
+                }
+
+                response = true;
+                msg = "Success";
+                status = 201;
             }
             catch (Exception ex)
             {
-                msg = "An error occurred, error: " + ex;
+                msg = "An error occurred, error: " + ex.Message;
                 status = 400;
             }
 
@@ -93,22 +99,20 @@ namespace _netstore.Repositories
                     }
                 }).Where(p => p.Id == productId).FirstOrDefault();
 
-                if (product != null)
-                {
-                    msg = "Success";
-                    response = true;
-                    status = 200;
-                }
-                else
-                {
+                if (product == null)
+                { 
                     response = false;
                     msg = "Product was not found";
                     status = 404;
                 }
+
+                response = true;
+                msg = "Success";
+                status = 200;
             }
             catch(Exception ex)
             {
-                msg = "An error occurred";
+                msg = "An error occurred, error: " + ex.Message;
                 status = 400;
             }
             return (product, status, response, msg);
@@ -148,7 +152,7 @@ namespace _netstore.Repositories
             }
             catch (Exception ex)
             {
-                msg = "An error occured";
+                msg = "An error occured, error: " + ex.Message;
                 status = 400;
             }
             return (products, status, response, msg);
@@ -156,14 +160,14 @@ namespace _netstore.Repositories
 
         public async Task<(ProductDTO product, int status, bool isSuccessful, string message)> UpdateProduct(int productId, UpdateProductDTO model)
         {
-            var product = new Product();
+            var product = new ProductDTO();
             int status = 0;
             bool response = false;
             string? msg = null;
 
             try
             {
-                var fetchedProduct = _context.Products.Where(p => p.Id == productId).FirstOrDefault();
+                var fetchedProduct = _context.Products.FirstOrDefault(p => p.Id == productId);
                 if (fetchedProduct != null)
                 {
                     var productOwner = fetchedProduct.Owner.Id;
@@ -183,18 +187,15 @@ namespace _netstore.Repositories
                             uploadedImage = fetchedProduct.Image;
                         }
 
-                        product = new Product
-                        {
-                            Id = productId,
-                            Name = model.Name,
-                            Description = model.Description,
-                            Price = model.Price,
-                            Image = uploadedImage,
-                            ProductType = model.ProductType,
-                            QuantityAvailable = model.QuantityAvailable,
-                            Owner = fetchedProduct.Owner
-                        };
-                        _context.Update(product);
+                        fetchedProduct.Name = model.Name;
+                        fetchedProduct.Description = model.Description;
+                        fetchedProduct.Price = model.Price;
+                        fetchedProduct.Image = uploadedImage;
+                        fetchedProduct.ProductType = model.ProductType;
+                        fetchedProduct.QuantityAvailable = model.QuantityAvailable;
+
+                        _context.Update(fetchedProduct);
+                        _context.SaveChanges();
                     }
                     else
                     {
@@ -202,19 +203,27 @@ namespace _netstore.Repositories
                         msg = "Unauthorized";
                         status = 401;
                     }
+                }
+                else
+                {
+                    response = false;
+                    msg = "Product not found";
+                    status = 404;
+                }
 
-                    response = true;
-                    msg = "Success";
-                    status = 200;
-                } 
+                response = true;
+                msg = "Success";
+                status = 200;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                msg = "An error occurred, error: " + ex;
+                msg = "An error occurred, error: " + ex.Message;
                 status = 400;
             }
 
+            return (product, status, response, msg);
         }
+
 
         public Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId)
         {
