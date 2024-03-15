@@ -113,7 +113,16 @@ namespace _netstore.Controllers
             }
 
             var result = await _productRepository.UpdateProduct(productId, product);
-            
+            if (!result.isSuccessful)
+            {
+                return StatusCode(result.status, result.message);
+            }
+            return StatusCode(200, new ApiResponse()
+            {
+                Data = result.Item1,
+                Message = result.message,
+                StatusCode = result.status
+            });
         }
 
     }
