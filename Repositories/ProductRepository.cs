@@ -37,7 +37,6 @@ namespace _netstore.Repositories
                 if (owner != null)
                 {
                     var imageResult = await _imageService.AddPhotoAsync(model.Image);
-
                     var product = new Product
                     {
                         Name = model.Name,
@@ -53,7 +52,7 @@ namespace _netstore.Repositories
                     _context.SaveChanges();
 
                     response = true;
-                    msg = "New product has been added successfully";
+                    msg = "Success";
                     status = 201;
                 }
             }
@@ -155,9 +154,66 @@ namespace _netstore.Repositories
             return (products, status, response, msg);
         }
 
-        public Task<(Product product, int status, bool isSuccessful, string message)> UpdateProduct(int productId)
+        public async Task<(ProductDTO product, int status, bool isSuccessful, string message)> UpdateProduct(int productId, UpdateProductDTO model)
         {
-            throw new NotImplementedException();
+            var product = new Product();
+            int status = 0;
+            bool response = false;
+            string? msg = null;
+
+            try
+            {
+                var fetchedProduct = _context.Products.Where(p => p.Id == productId).FirstOrDefault();
+                if (fetchedProduct != null)
+                {
+                    var productOwner = fetchedProduct.Owner.Id;
+
+                    if (productOwner == model.OwnerId)
+                    {
+                        string? uploadedImage = null;
+
+                        if (model.Image.Length > 0)
+                        {
+                            await _imageService.DeletePhotoAsync(fetchedProduct.Image);
+                            var result = await _imageService.AddPhotoAsync(model.Image);
+                            uploadedImage = result.Url.ToString();
+                        }
+                        else
+                        {
+                            uploadedImage = fetchedProduct.Image;
+                        }
+
+                        product = new Product
+                        {
+                            Id = productId,
+                            Name = model.Name,
+                            Description = model.Description,
+                            Price = model.Price,
+                            Image = uploadedImage,
+                            ProductType = model.ProductType,
+                            QuantityAvailable = model.QuantityAvailable,
+                            Owner = fetchedProduct.Owner
+                        };
+                        _context.Update(product);
+                    }
+                    else
+                    {
+                        response = false;
+                        msg = "Unauthorized";
+                        status = 401;
+                    }
+
+                    response = true;
+                    msg = "Success";
+                    status = 200;
+                } 
+            }
+            catch(Exception ex)
+            {
+                msg = "An error occurred, error: " + ex;
+                status = 400;
+            }
+
         }
 
         public Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId)

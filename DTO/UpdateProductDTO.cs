@@ -1,29 +1,24 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using _netstore.Data;
-using _netstore.Models;
 
 namespace _netstore.DTO
 {
-    public class CreateProductDTO
-    {
-        [Required]
+	public class UpdateProductDTO
+	{
+        public string? OwnerId { get; set; }
+
         public string? Name { get; set; }
 
-        [Required]
         public string? Description { get; set; }
 
-        [Required]
         public string? Price { get; set; }
 
-        [Required]
         public IFormFile? Image { get; set; }
 
         [ValidProductType]
         public string? ProductType { get; set; }
 
         public int QuantityAvailable { get; set; }
-
-        public string? OwnerId { get; set; }
     }
 }
+

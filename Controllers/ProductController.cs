@@ -50,7 +50,7 @@ namespace _netstore.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet("{productId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(400)]
@@ -93,11 +93,27 @@ namespace _netstore.Controllers
                 return StatusCode(newProduct.status, newProduct.message);
             }
 
-            return Ok(new ApiResponse()
+            return StatusCode(201, new ApiResponse()
             {
                 Message = newProduct.message,
                 StatusCode = newProduct.status
             });
+        }
+
+        [Authorize]
+        [HttpPatch("{productId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> UpdateProduct([FromQuery] int productId, [FromForm] UpdateProductDTO product)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(400, ModelState);
+            }
+
+            var result = await _productRepository.UpdateProduct(productId, product);
+            
         }
 
     }

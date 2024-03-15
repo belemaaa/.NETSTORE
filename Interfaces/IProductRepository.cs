@@ -12,9 +12,10 @@ namespace _netstore.Interfaces
 
 		Task<(int status, bool isSuccessful, string message)> AddProduct(CreateProductDTO model);
 
-		Task<(Product product, int status, bool isSuccessful, string message)> UpdateProduct(int productId);
+		Task<(Product product, int status, bool isSuccessful, string message)> UpdateProduct(int productId, UpdateProductDTO model);
 
-		Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId);
+        Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId);
     }
 }
 
+	

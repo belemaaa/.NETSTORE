@@ -1,12 +1,13 @@
 ﻿using System;
 using _netstore.Helpers;
+using _netstore.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;
 
 namespace _netstore.Services
 {
-	public class ImageService
+	public class ImageService : IImageService
 	{
 		private readonly Cloudinary _cloudinary;
         public ImageService(IOptions<CloudinarySettings> config)
@@ -34,6 +35,15 @@ namespace _netstore.Services
 			}
 			return uploadResult;
 		}
-	}
+
+
+        public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+        {
+            var deleteParams = new DeletionParams(publicId);
+            var result = await _cloudinary.DestroyAsync(deleteParams);
+
+            return result;
+        }
+    }
 }
 
