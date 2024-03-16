@@ -9,9 +9,10 @@ namespace _netstore.Helpers
 	{
 		public Mapper()
 		{
-			CreateMap<User, UserDTO>();
-			CreateMap<Product, ProductDTO>();
-			CreateMap<User, OwnerDTO>();
+			CreateMap<UserDTO, User>();
+			CreateMap<ProductDTO, Product>();
+			CreateMap<OwnerDTO, User>();
+			CreateMap<UpdateProductDTO, Product>();
 		}
 	}
 }

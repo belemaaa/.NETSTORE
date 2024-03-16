@@ -22,6 +22,7 @@ namespace _netstore.DTO
         [ValidProductType]
         public string? ProductType { get; set; }
 
+        [Range(0, Double.PositiveInfinity)]
         public int QuantityAvailable { get; set; }
 
         public string? OwnerId { get; set; }

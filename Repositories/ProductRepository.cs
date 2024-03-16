@@ -50,6 +50,10 @@ namespace _netstore.Repositories
                     };
                     _context.Add(product);
                     _context.SaveChanges();
+
+                    response = true;
+                    msg = "Success";
+                    status = 201;
                 }
                 else
                 {
@@ -57,10 +61,6 @@ namespace _netstore.Repositories
                     status = 401;
                     msg = "Unauthorized";
                 }
-
-                response = true;
-                msg = "Success";
-                status = 201;
             }
             catch (Exception ex)
             {
@@ -105,10 +105,12 @@ namespace _netstore.Repositories
                     msg = "Product was not found";
                     status = 404;
                 }
-
-                response = true;
-                msg = "Success";
-                status = 200;
+                else
+                {
+                    response = true;
+                    msg = "Success";
+                    status = 200;
+                }
             }
             catch(Exception ex)
             {
@@ -158,70 +160,80 @@ namespace _netstore.Repositories
             return (products, status, response, msg);
         }
 
-        public async Task<(ProductDTO product, int status, bool isSuccessful, string message)> UpdateProduct(int productId, UpdateProductDTO model)
+        public async Task<(int status, bool isSuccessful, string message)> UpdateProduct(int productId, UpdateProductDTO model)
         {
-            var product = new ProductDTO();
-            int status = 0;
             bool response = false;
-            string? msg = null;
-
+            string? msg;
+            int status;
             try
             {
-                var fetchedProduct = _context.Products.FirstOrDefault(p => p.Id == productId);
-                if (fetchedProduct != null)
+                if (model.OwnerId == null)
                 {
-                    var productOwner = fetchedProduct.Owner.Id;
-
-                    if (productOwner == model.OwnerId)
+                    response = false;
+                    msg = "Owner Id is required";
+                    status = 401;
+                }
+                else
+                {
+                    var product = await GetProduct(productId);
+                    var fetchedProduct = _mapper.Map<Product>(product.Item1);
+                    if (fetchedProduct != null && fetchedProduct.Owner.Id == model.OwnerId)
                     {
                         string? uploadedImage = null;
-
-                        if (model.Image.Length > 0)
+                        if (model.Image != null && model.Image.Length > 0)
                         {
-                            await _imageService.DeletePhotoAsync(fetchedProduct.Image);
-                            var result = await _imageService.AddPhotoAsync(model.Image);
-                            uploadedImage = result.Url.ToString();
+                            try
+                            {
+                                if (fetchedProduct.Image != null)
+                                {
+                                    await _imageService.DeletePhotoAsync(fetchedProduct.Image);
+                                }
+                                var result = await _imageService.AddPhotoAsync(model.Image);
+                                uploadedImage = result.Url.ToString(); 
+                            }
+                            catch (Exception ex)
+                            {
+                                msg = "Could not delete image";
+                                status = 400;
+                            }
                         }
                         else
                         {
                             uploadedImage = fetchedProduct.Image;
                         }
 
-                        fetchedProduct.Name = model.Name;
-                        fetchedProduct.Description = model.Description;
-                        fetchedProduct.Price = model.Price;
-                        fetchedProduct.Image = uploadedImage;
-                        fetchedProduct.ProductType = model.ProductType;
-                        fetchedProduct.QuantityAvailable = model.QuantityAvailable;
-
-                        _context.Update(fetchedProduct);
-                        _context.SaveChanges();
+                        _mapper.Map(model, fetchedProduct);
+                        _context.Entry(fetchedProduct).State = EntityState.Modified;
+                        try
+                        {
+                            // Attempt to save changes
+                            await _context.SaveChangesAsync();
+                            response = true;
+                            msg = "Success";
+                            status = 200;
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            msg = "Concurrency conflict occurred. The data may have been modified or deleted by another user.";
+                            status = 409;
+                        }           
                     }
                     else
                     {
                         response = false;
-                        msg = "Unauthorized";
-                        status = 401;
+                        msg = "Product was not found";
+                        status = 404;
                     }
                 }
-                else
-                {
-                    response = false;
-                    msg = "Product not found";
-                    status = 404;
-                }
-
-                response = true;
-                msg = "Success";
-                status = 200;
             }
+
             catch (Exception ex)
             {
-                msg = "An error occurred, error: " + ex.Message;
+                msg = "An error occurred, error: " + ex;
                 status = 400;
             }
 
-            return (product, status, response, msg);
+            return (status, response, msg);
         }
 
 

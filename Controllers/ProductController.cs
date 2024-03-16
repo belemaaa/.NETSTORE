@@ -105,7 +105,7 @@ namespace _netstore.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> UpdateProduct([FromQuery] int productId, [FromForm] UpdateProductDTO product)
+        public async Task<IActionResult> UpdateProduct(int productId, [FromForm] UpdateProductDTO product)
         {
             if (!ModelState.IsValid)
             {
@@ -119,7 +119,6 @@ namespace _netstore.Controllers
             }
             return StatusCode(200, new ApiResponse()
             {
-                Data = result.Item1,
                 Message = result.message,
                 StatusCode = result.status
             });
