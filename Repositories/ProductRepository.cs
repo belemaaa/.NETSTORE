@@ -167,65 +167,57 @@ namespace _netstore.Repositories
             int status;
             try
             {
-                if (model.OwnerId == null)
+                var product = await GetProduct(productId);
+                var fetchedProduct = _mapper.Map<Product>(product.Item1);
+                if (fetchedProduct != null && fetchedProduct.Owner.Id == model.OwnerId)
                 {
-                    response = false;
-                    msg = "Owner Id is required";
-                    status = 401;
-                }
-                else
-                {
-                    var product = await GetProduct(productId);
-                    var fetchedProduct = _mapper.Map<Product>(product.Item1);
-                    if (fetchedProduct != null && fetchedProduct.Owner.Id == model.OwnerId)
+                    string? uploadedImage = null;
+                    if (model.Image != null && model.Image.Length > 0)
                     {
-                        string? uploadedImage = null;
-                        if (model.Image != null && model.Image.Length > 0)
-                        {
-                            try
-                            {
-                                if (fetchedProduct.Image != null)
-                                {
-                                    await _imageService.DeletePhotoAsync(fetchedProduct.Image);
-                                }
-                                var result = await _imageService.AddPhotoAsync(model.Image);
-                                uploadedImage = result.Url.ToString(); 
-                            }
-                            catch (Exception ex)
-                            {
-                                msg = "Could not delete image";
-                                status = 400;
-                            }
-                        }
-                        else
-                        {
-                            uploadedImage = fetchedProduct.Image;
-                        }
-
-                        _mapper.Map(model, fetchedProduct);
-                        _context.Entry(fetchedProduct).State = EntityState.Modified;
                         try
                         {
-                            // Attempt to save changes
-                            await _context.SaveChangesAsync();
-                            response = true;
-                            msg = "Success";
-                            status = 200;
+                            if (fetchedProduct.Image != null)
+                            {
+                                await _imageService.DeletePhotoAsync(fetchedProduct.Image);
+                            }
+                            var result = await _imageService.AddPhotoAsync(model.Image);
+                            uploadedImage = result.Url.ToString(); 
                         }
-                        catch (DbUpdateConcurrencyException)
+                        catch (Exception ex)
                         {
-                            msg = "Concurrency conflict occurred. The data may have been modified or deleted by another user.";
-                            status = 409;
-                        }           
+                            msg = "Could not delete image, error: " + ex;
+                            status = 400;
+                        }
                     }
                     else
                     {
-                        response = false;
-                        msg = "Product was not found";
-                        status = 404;
+                        uploadedImage = fetchedProduct.Image;
                     }
+
+                    _mapper.Map(model, fetchedProduct);
+                    _context.Entry(fetchedProduct).State = EntityState.Modified;
+                    try
+                    {
+                        // Attempt to save changes
+                        await _context.SaveChangesAsync();
+                        response = true;
+                        msg = "Success";
+                        status = 200;
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        msg = "Concurrency conflict occurred. The data may have been modified or deleted by another user.";
+                        status = 409;
+                    }           
+                }
+                else
+                {
+                    response = false;
+                    msg = "Product was not found or this action is unauthorized";
+                    status = 404;
                 }
             }
+        
 
             catch (Exception ex)
             {
@@ -237,9 +229,36 @@ namespace _netstore.Repositories
         }
 
 
-        public Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId)
+        public async Task<(int status, bool isSuccessful, string message)> DeleteProduct(int productId, string OwnerId)
         {
-            throw new NotImplementedException();
+            bool response = false;
+            string? msg;
+            int status;
+            try
+            {
+                var product = await GetProduct(productId);
+                var fetchedProduct = _mapper.Map<Product>(product.Item1);
+
+                if (fetchedProduct != null && fetchedProduct.Owner.Id == OwnerId)
+                {
+                    _context.Products.Remove(fetchedProduct);
+                    response = true;
+                    msg = "Success";
+                    status = 200;
+                }
+                else
+                {
+                    response = false;
+                    msg = "Product was not found or this action is unauthorized";
+                    status = 404;
+                }
+            }
+            catch(Exception ex)
+            {
+                msg = "An error occurred, error: " + ex;
+                status = 400;
+            }
+            return (status, response, msg);
         }
     }
 }
