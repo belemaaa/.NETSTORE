@@ -36,17 +36,17 @@ namespace _netstore.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetProducts()
         {
-            var products = await _productRepository.GetProducts();
-            if (!products.isSuccessful)
+            var result = await _productRepository.GetProducts();
+            if (!result.isSuccessful)
             {
-                return StatusCode(products.status, products.message);
+                return StatusCode(result.status, result.message);
             }
 
             return Ok(new ApiResponse()
             {
-                Data = products.Item1,
-                Message = products.message,
-                StatusCode = products.status,
+                Data = result.Item1,
+                Message = result.message,
+                StatusCode = result.status,
             });
         }
 
@@ -61,15 +61,15 @@ namespace _netstore.Controllers
                 return StatusCode(400, ModelState);
             }
 
-            var product = await _productRepository.GetProduct(productId);
-            if (!product.isSuccessful)
+            var result = await _productRepository.GetProduct(productId);
+            if (!result.isSuccessful)
             {
-                return StatusCode(product.status, product.message);
+                return StatusCode(result.status, result.message);
             }
             return Ok(new ApiResponse()
             {
-                Data = product.Item1,
-                Message = product.message,
+                Data = result.Item1,
+                Message = result.message,
                 StatusCode = 200,
             });
         }
@@ -87,24 +87,24 @@ namespace _netstore.Controllers
                 return StatusCode(400, ModelState);
             }
 
-            var newProduct = await _productRepository.AddProduct(product);
-            if (!newProduct.isSuccessful)
+            var result = await _productRepository.AddProduct(product);
+            if (!result.isSuccessful)
             {
-                return StatusCode(newProduct.status, newProduct.message);
+                return StatusCode(result.status, result.message);
             }
 
             return StatusCode(201, new ApiResponse()
             {
-                Message = newProduct.message,
-                StatusCode = newProduct.status
+                Message = result.message,
+                StatusCode = result.status
             });
         }
 
         [Authorize]
         [HttpPatch("{productId}")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> UpdateProduct(int productId, [FromForm] UpdateProductDTO product)
         {
             if (!ModelState.IsValid)
@@ -124,6 +124,30 @@ namespace _netstore.Controllers
             });
         }
 
+        [Authorize]
+        [HttpDelete("{productId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(403)]
+        public async Task<IActionResult> DeleteProduct(int productId, string OwnerId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(400, ModelState);
+            }
+
+            var result = await _productRepository.DeleteProduct(productId, OwnerId);
+            if (!result.isSuccessful)
+            {
+                return StatusCode(result.status, result.message);
+            }
+            return StatusCode(200, new ApiResponse()
+            {
+                Message = result.message,
+                StatusCode = result.status
+            });
+
+        }
     }
 }
 

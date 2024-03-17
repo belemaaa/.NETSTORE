@@ -239,12 +239,21 @@ namespace _netstore.Repositories
                 var product = await GetProduct(productId);
                 var fetchedProduct = _mapper.Map<Product>(product.Item1);
 
-                if (fetchedProduct != null && fetchedProduct.Owner.Id == OwnerId)
+                if (fetchedProduct != null)
                 {
-                    _context.Products.Remove(fetchedProduct);
-                    response = true;
-                    msg = "Success";
-                    status = 200;
+                    var productOwner = fetchedProduct.Owner.Id;
+                    if (productOwner == OwnerId)
+                    {
+                        _context.Products.Remove(fetchedProduct);
+                        response = true;
+                        msg = "Success";
+                        status = 200;
+                    }
+                    else
+                    {
+                        msg = "Forbidden";
+                        status = 403;
+                    }
                 }
                 else
                 {
