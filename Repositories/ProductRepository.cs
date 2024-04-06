@@ -198,7 +198,6 @@ namespace _netstore.Repositories
                     _context.Entry(fetchedProduct).State = EntityState.Modified;
                     try
                     {
-                        // Attempt to save changes
                         await _context.SaveChangesAsync();
                         response = true;
                         msg = "Success";
